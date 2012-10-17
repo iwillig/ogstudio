@@ -1,0 +1,20 @@
+datastores:
+  - name: nielsen
+    type: postgis
+
+styles:
+  - name: airport
+    type: yaml
+    path: nielsen-data/styles/major_city.yml
+
+tables:
+  - name: airport
+    datastore: nielsen
+
+maps:
+  - name: high contrast
+    epsg: 4326
+    bbox: [-79.8589395,40.3956803,-71.8420291,45.1157015]
+    layers:
+      - table: airport
+        style: airport
