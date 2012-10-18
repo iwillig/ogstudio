@@ -11,6 +11,8 @@ var load_main = function (opts) {
         layer;
 
     $('#show-map').height(height);
+    $('#show-map').css('background', opts.mapInfo.bgcolor);
+
     map = new OpenLayers.Map('show-map');
 
     for (i = 0; i < opts.mapInfo.layers.length; i++) {

@@ -1,0 +1,56 @@
+# this sets up a reference that allows use to define the style object
+# sperate from the configuration object
+planet_osm_line: &line
+  name: Style for planet osm line data
+  feature-styles:
+    - rules:
+        - where: highway = 'motorway' or highway = 'primary' or highway = 'motorway_link'
+          symbolizers:
+            text:
+              halo:
+                radius: 2
+                color: '#ffffff'
+              fill:
+                color: '#000000'
+              vendor:
+                followLine: 'true'
+              label:
+                property: name
+            line:
+              stroke:
+                width: 1
+                color: '#ffffff'
+
+# define the data stores for the map
+datastores:
+  - name: osm
+    type: postgis
+
+# define the style configuration objects
+styles:
+  - name: planet_osm_line
+    type: yaml
+    body: *line
+
+tables:
+  - name: planet_osm_line
+    datastore: osm
+
+  - name: planet_osm_point
+    datastore: osm
+
+  - name: planet_osm_roads
+    datastore: osm
+
+  - name: planet_osm_line
+    datastore: osm
+
+# define the map objects, the important stuff
+maps:
+  - name: osm dark
+    bgcolor: '#000000'
+    epsg: 4326
+    bbox: [-79.8589395,40.3956803,-71.8420291,45.1157015]
+    layers:
+      - table: planet_osm_roads
+        style: planet_osm_line

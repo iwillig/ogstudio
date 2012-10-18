@@ -14,9 +14,11 @@
 (System/setProperty "org.geotools.referencing.forceXY" "true")
 
 (defroutes app-routes
-  (GET "/" [] views/index)
-  (GET "/maps/:name" [] views/show-map)
-
+  (GET "/"              [] views/index)
+  (GET "/maps/:name"    [] views/show-map)
+  (GET "/tables/:name"  [] views/show-table)
+  (GET "/styles/:name"  [] views/show-style)
+  
   (context "/services" []
            (ogc/with-ogc-parameters ogc/service-routes))
   

@@ -1,11 +1,21 @@
 (ns ogstudio.views
+  (:import   
+   [com.vividsolutions.jts.geom Geometry]
+   [org.geotools.filter FilterFactoryImpl]
+   [org.geotools.styling SLDTransformer]
+   [org.geotools.factory CommonFactoryFinder])
   (:require [ogstudio.core :as core])
   (:use
+   [geoscript.style]
+   [geoscript.feature]
    [clojure.data.json :only (json-str)]
    [hiccup.element :only (javascript-tag)]
    [hiccup.form]
+   [hiccup.util :only (escape-html)]
    [hiccup.page :only (html5 include-js include-css)]))
 
+
+(def ^FilterFactoryImpl ff           (CommonFactoryFinder/getFilterFactory2 nil))
 
 
 (defn static-url [req url]
@@ -28,21 +38,67 @@
      body]
     js]))
 
-(defn show-map [req]
-  (let [map-name (:name (:route-params req))
-        map-info (core/get-map map-name)]
-    (when map-info
+(defn style->sld [style]
+  (let [trans (doto (SLDTransformer.)
+                (.setIndentation 2))]
+    (.transform trans style)))
+
+
+(defn show-style [{{name :name} :route-params :as req}]
+  (when-let [style-info (core/get-style name)]
+    (layout req [:div (str (:gt style-info)) [:pre (escape-html (style->sld (:gt style-info)))]])))
+
+(defn show-map [{{name :name} :route-params :as req}]
+  (when-let [map-info (core/get-map name)]
+    (layout
+     req
+     [:div.row-fluid
+      [:div.span2
+       [:h2 "Map : " (:name map-info)]]
+      [:div#show-map.map.span10]]
+     :js (list (include-js
+                (static-url req "js/openlayers/OpenLayers.js")
+                (static-url req "js/jquery-1.8.2.min.js")
+                (static-url req "js/show-map.js"))
+               (javascript-tag (format "load_main({mapInfo: %s});" (json-str map-info)))))))
+
+
+(defn get-sample-features [fs]
+  (let [query (doto (org.geotools.data.Query.)
+                 (.setMaxFeatures 100))
+        iter-feat (.iterator (.getFeatures fs query))
+        sample (iterator-seq iter-feat)]
+    sample))
+
+(defn show-table [{{name :name} :route-params :as req}]
+  (when-let [table-info (core/get-table name)]
+    (let [fs (:gt table-info)
+          features (.getFeatures fs)
+          schema (get-fields (.getSchema fs))
+          non-geom-schema (filter #(not (isa? (:type %) Geometry)) schema)
+          sample (get-sample-features fs)]
       (layout
        req
-       [:div.row-fluid
-        [:div.span2
-         [:h2 "Map : " (:name map-info)]]
-        [:div#show-map.map.span10]]
-       :js (list (include-js
-                  (static-url req "js/openlayers/OpenLayers.js")
-                  (static-url req "js/jquery-1.8.2.min.js")
-                  (static-url req "js/show-map.js"))
-                 (javascript-tag (format "load_main({mapInfo: %s});" (json-str map-info))))))))
+       [:div
+        [:h3 "Layer name: " (.getName fs)]
+        [:p "Feature count: " (.size features)]
+        [:table.table.table-striped.table-bordered
+         [:thead [:tr
+                  [:th "Field Name"]
+                  [:th "Field Type"]]]
+           [:tbody
+            (for [{name :name type :type} schema]
+              [:tr
+               [:td name]
+               [:td type]])]]
+        [:table.table.table-bordered.table-striped
+         [:thead [:tr (for [{name :name type :type} non-geom-schema] [:th name])]]
+         (for [feature sample]
+           (do
+             [:tr
+              (for [{name :name type :type} non-geom-schema]
+                [:td (.getAttribute feature name)])]))]]))))
+
 
 (defn index [req]
   (let [{:keys [tables maps datastores styles]} @core/catalog]
@@ -68,9 +124,9 @@
        [:a {:id "tables"}]
        [:ol
         (for [[table-name table] tables]
-          [:li [:p (name table-name)]])]]
+          [:li [:a {:href (str "/tables/" (name table-name))} (name table-name)]])]]
       [:div [:h2 "Styles"]
        [:a {:id "styles"}]
        [:ol
         (for [[style-name style] styles]
-          [:li [:p (name style-name)]])]]])))
+          [:li [:a {:href (str "/styles/" (name style-name))} (name style-name)]])]]])))

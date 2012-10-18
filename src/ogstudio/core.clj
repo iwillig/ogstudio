@@ -65,13 +65,15 @@
      (:body style-info)
      (yaml/parse-string (slurp (:path style-info))))))
 
+(defn style-last-modified [style-info]
+  (when-let [path  (:path style-info)]
+    (.lastModified (File. path))))
 
 (defn add-style! [style-info]
-  (let [f (File. (:path style-info))]
-    (add-resource!
-     :styles (assoc style-info
-               :last-modified (.lastModified f)
-               :gt (load-style style-info)))))
+  (add-resource!
+   :styles (assoc style-info
+             :last-modified (style-last-modified style-info)
+             :gt (load-style style-info))))
 
 (defn add-map! [map-info]
   (add-resource! :maps map-info))
@@ -103,9 +105,10 @@
    100
    (fn []
      (doseq [[style-name style] (:styles @catalog)]
-       (when (is-modified style)
-         (println "Updating style" style-name)
-         (add-style! style))))))
+       (when-not (:body style)
+         (when (is-modified style)
+           (println "Updating style" style-name)
+           (add-style! style)))))))
 
 
 (defn load-catalog [path]
@@ -138,4 +141,4 @@
   (reset! catalog {}))
 
 (defn load-default-catalog []
-  (load-catalog "./catalog.yml"))
+  (load-catalog "./osm.yml"))
