@@ -8,7 +8,7 @@ planet_osm_line: &line
           symbolizers:
             text:
               halo:
-                radius: 2
+                radius: 1
                 color: '#ffffff'
               fill:
                 color: '#000000'
@@ -18,8 +18,8 @@ planet_osm_line: &line
                 property: name
             line:
               stroke:
-                width: 1
-                color: '#ffffff'
+                width: 3
+                color: '#eeeeee'
 
 # define the data stores for the map
 datastores:

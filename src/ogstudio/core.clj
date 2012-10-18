@@ -41,8 +41,15 @@
 (defmulti load-datastore (fn [x] (keyword (:type x))))
 
 (defmethod load-datastore :postgis
-  [params]
-  (postgis :database (:name params)))
+  [{:keys [port host user passwd name]
+    :or {port "5432" host "localhost" user "postgres" passwd ""}}]
+  (make-datastore
+   {:port port
+    :host host
+    :user user
+    :passwd passwd
+    :dbtype "postgis"
+    :database name}))
 
 (defmethod load-datastore :shapefile
   [params]
