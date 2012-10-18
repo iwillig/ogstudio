@@ -1,0 +1,6 @@
+#show-map {
+    background: #eee;
+    height: 600px;
+}
+
+.map img { max-width:none; };

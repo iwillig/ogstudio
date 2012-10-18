@@ -3,18 +3,51 @@ datastores:
     type: postgis
 
 styles:
+  - name: bus_term
+    type: yaml
+    path: nielsen-data/styles/bus_terms.yml
+
+  - name: amusement_centers
+    type: yaml
+    path: nielsen-data/styles/amusement_centers.yml
+
   - name: airport
     type: yaml
-    path: nielsen-data/styles/major_city.yml
+    path: nielsen-data/styles/airport.yml
+
+
+  - name: great_lake
+    type: yaml
+    path: nielsen-data/styles/great_lake.yml
 
 tables:
   - name: airport
     datastore: nielsen
 
+  - name: amusement_centers
+    datastore: nielsen
+
+  - name: great_lake
+    datastore: nielsen
+
 maps:
+  - name: test
+    epsg: 4326
+    bbox: [-79.8589395,40.3956803,-71.8420291,45.1157015]
+    layers:
+      - table: airport
+        style: airport
+
   - name: high contrast
     epsg: 4326
     bbox: [-79.8589395,40.3956803,-71.8420291,45.1157015]
     layers:
       - table: airport
         style: airport
+
+      - table: amusement_centers
+        style: amusement_centers
+
+
+      - table: great_lake
+        style: great_lake
