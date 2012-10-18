@@ -48,13 +48,24 @@
   (when-let [style-info (core/get-style name)]
     (layout req [:div (str (:gt style-info)) [:pre (escape-html (style->sld (:gt style-info)))]])))
 
+(defn show-map-layers [mapinfo]
+  [:ul
+   (for [{table :table style :style} (:layers mapinfo)]
+     [:li [:h4 "Layer"]
+      [:p "Table " [:a {:href (str "/tables/" table)} table]]
+      [:p "Style " [:a {:href (str "/styles/" style)} style]]])])
+
 (defn show-map [{{name :name} :route-params :as req}]
   (when-let [map-info (core/get-map name)]
     (layout
      req
      [:div.row-fluid
       [:div.span2
-       [:h2 "Map : " (:name map-info)]]
+       [:h2 "Map : " (:name map-info)]
+       [:div#mapInfo
+        [:p#zoom]
+        [:p#resolution]
+        (show-map-layers map-info)]]
       [:div#show-map.map.span10]]
      :js (list (include-js
                 (static-url req "js/openlayers/OpenLayers.js")

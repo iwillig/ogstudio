@@ -4,6 +4,7 @@ var load_main = function (opts) {
     'use strict';
     var height = $(document).height() - 80,
         i,
+        mapInfo = $('#mapInfo'),
         map,
         bounds,
         tables = [],
@@ -14,6 +15,11 @@ var load_main = function (opts) {
     $('#show-map').css('background', opts.mapInfo.bgcolor);
 
     map = new OpenLayers.Map('show-map');
+
+    map.events.register('zoomend', map, function (evnt) {
+        $('#resolution').html('Scale: ' + map.getScale());
+        $('#zoom').html('Zoom :' + map.getZoom());
+    });
 
     for (i = 0; i < opts.mapInfo.layers.length; i++) {
         var layerInfo = opts.mapInfo.layers[i];
