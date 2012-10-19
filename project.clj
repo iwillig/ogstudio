@@ -14,7 +14,7 @@
                  [clj-yaml "0.4.0"]
                  [org.clojure/data.json "0.1.3"]
                  [hiccup "1.0.1"]
-                 [geoscript "0.1.0-SNAPSHOT"]
+                 [geoscript "0.4.0-SNAPSHOT"]
                  [org.geotools/gt-epsg-hsql ~gt-version]]
   :plugins [[lein-ring "0.7.3"] [lein-swank "1.4.4"]]
   :ring {:init ogstudio.core/load-default-catalog

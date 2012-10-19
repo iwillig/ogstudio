@@ -38,11 +38,6 @@
      body]
     js]))
 
-(defn style->sld [style]
-  (let [trans (doto (SLDTransformer.)
-                (.setIndentation 2))]
-    (.transform trans style)))
-
 
 (defn show-style [{{name :name} :route-params :as req}]
   (when-let [style-info (core/get-style name)]

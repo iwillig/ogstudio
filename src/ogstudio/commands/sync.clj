@@ -144,49 +144,34 @@
      :method :delete)))
 
 
-(defn load-resources [workspace]
-  (try
-    
-    (catch Exception e (println e)))
-
-    (create-workspace workspace)
-
-    (try
-      (delete-datastore workspace "nielsen")
-      (catch Exception e (println e))))
-
-(defn try-if [func]
-  (try
-    (func)
-    (catch Exception e (println e))))
-
-
 (defn -main [& args]
   ;; try deleting the workspace, if it already exists move on the next one
   (let [catalog (yaml/parse-string (slurp "nielsen-data/catalog.yml"))
         workspace "nielsen"]
-    (try 
+    (try
       (delete-workspace workspace)
       (catch Exception e (println e)))
 
     (create-workspace workspace)
     
-    ;; (doseq [ds (:datastores catalog)]
-    ;;   (create-datastore workspace
-    ;;    {:name (:name ds)
-    ;;     :connectionParameters
-    ;;     {:database (:name ds)
-    ;;      :user (:user ds)
-    ;;      :host (:host ds)
-    ;;      :port (:port ds)
-    ;;      :dbtype "postgis"}}))
+    (doseq [ds (:datastores catalog)]
+      (create-datastore workspace
+       {:name (:name ds)
+        :connectionParameters
+        {:database (:name ds)
+         :user (:user ds)
+         :host (:host ds)
+         :port (:port ds)
+         :dbtype "postgis"}}))
 
-    ;; (doseq [table (:tables catalog)]
-    ;;   (create-feature-type workspace (:datastore table) {:name (:name table)}))
+    (doseq [table (:tables catalog)]
+      (create-feature-type workspace (:datastore table) {:name (:name table)}))
 
-    (doseq [style (take 1 (:styles catalog))]
+    (doseq [style (take 55 (:styles catalog))]
       (let [style-obj (core/load-style style)]
-        (create-style workspace (:name style) (views/style->sld style-obj))
-        )
-      )
-    ))
+        (create-style
+         workspace
+         (:name style)
+         (gstyle/style->sld
+          (gstyle/make-sld {:name (:name style)
+                            :style style-obj})))))))
