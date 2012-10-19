@@ -4,22 +4,28 @@ planet_osm_line: &line
   name: Style for planet osm line data
   feature-styles:
     - rules:
-        - where: highway = 'motorway' or highway = 'primary' or highway = 'motorway_link'
+        - where: highway = 'motorway'
+          min:  216281.17309570312 # zoom level 11
           symbolizers:
-            text:
-              halo:
-                radius: 1
-                color: '#ffffff'
-              fill:
-                color: '#000000'
-              vendor:
-                followLine: 'true'
-              label:
-                property: name
             line:
               stroke:
-                width: 3
-                color: '#eeeeee'
+                width: 1
+                color: '#000000'
+        - where: highway = 'motorway' or highway = 'motoroway_link'
+          max: 216280.17309570312
+          symbolizers:
+            line:
+              stroke:
+                width: 10
+                color: '#000000'
+
+test: &test
+  name:
+  feature-styles:
+    - rules:
+      - symbolizers:
+          line:
+            color: '#eeeeee'
 
 # define the data stores for the map
 datastores:
@@ -31,6 +37,9 @@ styles:
   - name: planet_osm_line
     type: yaml
     body: *line
+  - name: test
+    type: yaml
+    body: *test
 
 tables:
   - name: planet_osm_line
@@ -47,8 +56,8 @@ tables:
 
 # define the map objects, the important stuff
 maps:
-  - name: osm dark
-    bgcolor: '#000000'
+  - name: osm light
+    bgcolor: '#ffffff'
     epsg: 4326
     bbox: [-79.8589395,40.3956803,-71.8420291,45.1157015]
     layers:

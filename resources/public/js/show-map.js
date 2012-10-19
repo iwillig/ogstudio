@@ -1,11 +1,10 @@
 /*global $:true, document: true, OpenLayers */
-
+var map;
 var load_main = function (opts) {
     'use strict';
     var height = $(document).height() - 80,
         i,
         mapInfo = $('#mapInfo'),
-        map,
         bounds,
         tables = [],
         styles = [],
@@ -38,7 +37,7 @@ var load_main = function (opts) {
     map.addLayer(layer);
 
     map.addControl(new OpenLayers.Control.LayerSwitcher());
-
+    map.addControl(new OpenLayers.Control.Permalink({anchor: true}));
     bounds = new OpenLayers.Bounds.fromArray(opts.mapInfo.bbox);
     map.zoomToExtent(bounds);
 

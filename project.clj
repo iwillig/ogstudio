@@ -8,6 +8,7 @@
   :uberjar-name "ogstudio.jar"
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [org.clojure/tools.cli "0.2.2"]
+                 [clj-http "0.5.6"]
                  [compojure "1.1.1"]
                  [ring "1.1.6"]
                  [clj-yaml "0.4.0"]
