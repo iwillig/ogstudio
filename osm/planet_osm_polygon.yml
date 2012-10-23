@@ -1,0 +1,25 @@
+name: Style for planet polygon
+feature-styles:
+
+  - rules:
+
+      - where: leisure = 'park'
+        symbolizers:
+          polygon:
+            stroke:
+              color: '#c9c9c9'
+            fill:
+              color: '#c9c9c9'
+
+      - where: natural = 'water'
+        max: 108140.58654785156
+        symbolizers:
+          polygon:
+            fill:
+              color: '#000000'
+
+      - where: waterway = 'riverbank' or natural = 'bay'
+        symbolizers:
+          polygon:
+            fill:
+              color: '#000000'

@@ -148,4 +148,4 @@
   (reset! catalog {}))
 
 (defn load-default-catalog []
-  (load-catalog "./osm.yml"))
+  (load-catalog "./osm/catalog.yml"))

@@ -1,4 +1,5 @@
 (ns ogstudio.commands.sync
+  (:gen-class)
   (:require
    [ogstudio.views    :as views]
    [ogstudio.core     :as core]
@@ -51,6 +52,11 @@
       (conj url f)
       url)))
 
+(defn make-layer-group [& [name]]
+  (let [url [*geoserver-url* "layergroups"]]
+    (if name
+      (conj url name)
+      url)))
 
 ;; workspaces
 (defn get-workspaces []
@@ -126,14 +132,11 @@
 (defn get-styles []
   (request (url-join [*geoserver-url* "styles"])))
 
-(comment
-
-
-  )
 
 (defn create-style [workspace style body]
   (request (url-join (conj (make-workspace-url workspace) "styles"))
            :data (clojure.java.io/input-stream  (.getBytes body))
+           :query-params {"name" style}
            :content-type {"Content-type" "application/vnd.ogc.sld+xml"}
            :method :post))
 
@@ -144,34 +147,71 @@
      :method :delete)))
 
 
-(defn -main [& args]
-  ;; try deleting the workspace, if it already exists move on the next one
-  (let [catalog (yaml/parse-string (slurp "nielsen-data/catalog.yml"))
-        workspace "nielsen"]
+(defn get-layer-groups []
+  (request (url-join (make-layer-group))))
+
+(defn get-layer-group [group-name]
+  (request (url-join (make-layer-group group-name))))
+
+(defn delete-layer-group [group-name]
+  (request (url-join (make-layer-group group-name))
+           :method :delete))
+
+(defn create-layer-group [name styles layers]
+  (request (url-join (make-layer-group))
+           :data
+           (json/json-str
+            {:layerGroup
+             {:name name
+              :bounds
+              {
+               :minx -180,
+               :maxx 180,
+               :miny -90,
+               :maxy 90,
+               :crs "EPSG:4326"}
+              :layers {:layer layers}
+              :styles {:style styles}}})
+           :method :post))
+
+
+(defn update-remote-geoserver [catalog]
+
+  (let [workspace (:workspace catalog)]
+
     (try
       (delete-workspace workspace)
       (catch Exception e (println e)))
 
+    (println "Creating workspace" workspace)
     (create-workspace workspace)
-    
+
     (doseq [ds (:datastores catalog)]
-      (create-datastore workspace
+      (println "Creating datastore " (:name ds))
+      (create-datastore
+       workspace
        {:name (:name ds)
         :connectionParameters
         {:database (:name ds)
-         :user (:user ds)
-         :host (:host ds)
-         :port (:port ds)
-         :dbtype "postgis"}}))
-
+         :user (or  (:user ds) "postgres")
+         :host (or  (:host ds) "localhost")
+         :port (or  (:port ds) 5432)
+         :dbtype (:type ds)}}))
+    
     (doseq [table (:tables catalog)]
+      (println "Creating feature type" (:name table))
       (create-feature-type workspace (:datastore table) {:name (:name table)}))
 
-    (doseq [style (take 55 (:styles catalog))]
+    (doseq [style (:styles catalog)]
       (let [style-obj (core/load-style style)]
+        (println "Creating style" (:name style))
         (create-style
          workspace
          (:name style)
          (gstyle/style->sld
           (gstyle/make-sld {:name (:name style)
                             :style style-obj})))))))
+
+
+(defn -main [& args]
+  (update-remote-geoserver (yaml/parse-string (slurp (first args)))))

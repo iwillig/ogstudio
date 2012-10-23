@@ -18,6 +18,7 @@ var load_main = function (opts) {
     map.events.register('zoomend', map, function (evnt) {
         $('#resolution').html('Scale: ' + map.getScale());
         $('#zoom').html('Zoom :' + map.getZoom());
+        $('#bbox').html(map.getExtent().toArray().join(','));
     });
 
     for (i = 0; i < opts.mapInfo.layers.length; i++) {

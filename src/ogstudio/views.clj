@@ -3,6 +3,7 @@
    [com.vividsolutions.jts.geom Geometry]
    [org.geotools.filter FilterFactoryImpl]
    [org.geotools.styling SLDTransformer]
+   [java.awt GraphicsEnvironment]
    [org.geotools.factory CommonFactoryFinder])
   (:require [ogstudio.core :as core])
   (:use
@@ -60,6 +61,7 @@
        [:div#mapInfo
         [:p#zoom]
         [:p#resolution]
+        [:pre#bbox]
         (show-map-layers map-info)]]
       [:div#show-map.map.span10]]
      :js (list (include-js
@@ -82,12 +84,15 @@
           features (.getFeatures fs)
           schema (get-fields (.getSchema fs))
           non-geom-schema (filter #(not (isa? (:type %) Geometry)) schema)
-          sample (get-sample-features fs)]
+          sample (get-sample-features fs)
+          bounds (.getBounds features)]
       (layout
        req
        [:div
-        [:h3 "Layer name: " (.getName fs)]
-        [:p "Feature count: " (.size features)]
+        [:h3 "Layer name: "    (.getName fs)]
+        [:p "Feature count: "  (.size features)]
+        [:p "Projection: "     (.getCoordinateReferenceSystem bounds)]
+        [:p "Bounding box: "   bounds]
         [:table.table.table-striped.table-bordered
          [:thead [:tr
                   [:th "Field Name"]
@@ -106,16 +111,20 @@
                 [:td (.getAttribute feature name)])]))]]))))
 
 
+
 (defn index [req]
-  (let [{:keys [tables maps datastores styles]} @core/catalog]
+  (let [{:keys [tables maps datastores styles]} @core/catalog
+        graphics (GraphicsEnvironment/getLocalGraphicsEnvironment)]
     (layout
      req
      [:div
       [:ul
-       [:li [:a {:href "#maps"} "Maps"]]
+       [:li [:a {:href "#maps"}       "Maps"]]
        [:li [:a {:href "#datastores"} "Datastores"]]
-       [:li [:a {:href "#tables"} "Tables"]]
-       [:li [:a {:href "#styles"} "Styles"]]]
+       [:li [:a {:href "#tables"}     "Tables"]]
+       [:li [:a {:href "#styles"}     "Styles"]]
+       [:li [:a {:href "#fonts"}      "Fonts"]]
+       ]
       [:div [:h2 "Maps"]
        [:a {:id "maps"}]
        [:ul
@@ -135,4 +144,12 @@
        [:a {:id "styles"}]
        [:ol
         (for [[style-name style] styles]
-          [:li [:a {:href (str "/styles/" (name style-name))} (name style-name)]])]]])))
+          [:li [:a {:href (str "/styles/" (name style-name))} (name style-name)]])]]
+      [:div [:h2 "Fonts"]
+       [:a {:id "fonts"}]
+       (for [font (.getAvailableFontFamilyNames graphics)]
+         [:p font]
+         )
+       ] 
+      ])))
+
