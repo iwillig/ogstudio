@@ -13,7 +13,9 @@ var load_main = function (opts) {
     $('#show-map').height(height);
     $('#show-map').css('background', opts.mapInfo.bgcolor);
 
-    map = new OpenLayers.Map('show-map');
+    map = new OpenLayers.Map('show-map', {
+        numZoomLevels: 20
+    });
 
     map.events.register('zoomend', map, function (evnt) {
         $('#resolution').html('Scale: ' + map.getScale());
