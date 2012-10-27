@@ -13,6 +13,7 @@ var load_main = function (opts) {
     $('#show-map').height(height);
     $('#show-map').css('background', opts.mapInfo.bgcolor);
 
+
     var osmLayer = new OpenLayers.Layer.OSM("OpenStreetMap");
 
     var aliasproj = new OpenLayers.Projection("EPSG:3857");
@@ -20,7 +21,8 @@ var load_main = function (opts) {
 
     map = new OpenLayers.Map('show-map', {
         projection: new OpenLayers.Projection("EPSG:3857"),
-        displayProjection: new OpenLayers.Projection("EPSG:4326")
+        displayProjection: new OpenLayers.Projection("EPSG:4326"),
+        numZoomLevels: 20
     });
 
     map.events.register('zoomend', map, function (evnt) {
