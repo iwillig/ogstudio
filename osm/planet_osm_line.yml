@@ -3,71 +3,26 @@ feature-styles:
 
   - rules:
       - where: boundary = 'administrative' and admin_level = 4
+        zoom: [7, 10]
         symbolizers:
           line:
             stroke:
-              dash-array: [2, 2]
+              dash-array: [4, 10]
               width: 1
               color: '#808080'
 
-
-  - rules:
-      - where: highway = 'residential'
-        max: 54080.29327392578
-        symbolizers:
-          line:
-            stroke:
-              color: '#eeeeee'
-
-  - rules:
-      - where: highway = 'motorway'
-        symbolizers:
-          line:
-            stroke:
-              width: 6
-              color: '#ffffff'
-
-      - where: highway = 'secondary'
-        min: 108140.58654785156
-        symbolizers:
-          line:
-            stroke:
-              width: 1
-              color: '#eeeeee'
-
-
+              color: '#000000'
   - rules:
       - where: highway = 'primary'
-        max: 432562.34619140625
-        min: 54070.29327392578
+        zoom-levels:
+          max: 6
+          min: 10
         symbolizers:
           line:
             stroke:
-              width: 1
+              width: .5
               color: '#000000'
 
-  - rules:
-
-      - where: highway = 'motorway'
-        min: 27035.14663696289
-        symbolizers:
-          line:
-            stroke:
-              line-cap: round
-              line-join: round
-              width: 2
-              color: '#000000'
-
-
-      - where: highway = 'motorway'
-        max: 27035.14663696289
-        symbolizers:
-          line:
-            stroke:
-              line-cap: round
-              line-join: round
-              width: 3
-              color: '#000000'
 
       - where: highway = 'trunk'
         symbolizers:
@@ -76,29 +31,90 @@ feature-styles:
               width: 1
               color: '#000000'
 
-  - rules:
-      - where: highway = 'secondary' or highway = 'primary'
-        max: 108140.58654785156
-        symbolizers:
-          text:
-            halo:
-              radius: 2
-              color: '#ffffff'
-            fill:
-              color: '#000000'
-            placement:
-              displacment: 10
-              line:
-                offset: 10
-            vendor:
-              followLine: 'true'
-            label:
-              property: name
-            font:
-              family: Droid Sans
-              size: 13
 
+  - rules:
+      - where: highway = 'residential'
+        zoom-levels:
+          max: 10
+          min: 15
+        symbolizers:
+          line:
+            stroke:
+              width: .5
+              color: '#000000'
+
+      - where: highway = 'motorway'
+        zoom-levels:
+          max: 6
+          min: 10
+        symbolizers:
           line:
             stroke:
               width: 1
-              color: '#000000'
+
+  #     - where: highway = 'secondary'
+  #       min: 108140.58654785156
+  #       symbolizers:
+  #         line:
+  #           stroke:
+  #             width: 1
+  #             color: '#eeeeee'
+
+
+  # - rules:
+  #     - where: highway = 'primary'
+  #       symbolizers:
+  #         line:
+  #           stroke:
+  #             width: 1
+  #             color: '#000000'
+
+  # - rules:
+
+  #     - where: highway = 'motorway'
+  #       min: 27035.14663696289
+  #       symbolizers:
+  #         line:
+  #           stroke:
+  #             line-cap: round
+  #             line-join: round
+  #             width: 2
+  #             color: '#000000'
+
+
+  #     - where: highway = 'motorway'
+  #       max: 27035.14663696289
+  #       symbolizers:
+  #         line:
+  #           stroke:
+  #             line-cap: round
+  #             line-join: round
+  #             width: 3
+  #             color: '#000000'
+
+  # - rules:
+  #     - where: highway = 'secondary' or highway = 'primary'
+  #       max: 108140.58654785156
+  #       symbolizers:
+  #         text:
+  #           halo:
+  #             radius: 2
+  #             color: '#ffffff'
+  #           fill:
+  #             color: '#000000'
+  #           placement:
+  #             displacment: 10
+  #             line:
+  #               offset: 10
+  #           vendor:
+  #             followLine: 'true'
+  #           label:
+  #             property: name
+  #           font:
+  #             family: Droid Sans
+  #             size: 13
+
+  #         line:
+  #           stroke:
+  #             width: 1
+  #             color: '#000000'

@@ -3,40 +3,6 @@ feature-styles:
 
   - rules:
 
-      - where: amenity = 'courthouse'
-        symbolizers:
-          graphic:
-            size: 1
-            symbols:
-              - mark:
-                  name: circle
-                  size: 2
-                  stroke:
-                    color: '#000000'
-                  fill:
-                    color: '#000000'
-
-
-      - where: amenity = 'library'
-        symbolizers:
-          graphic:
-            size: 10
-            symbols:
-              - mark:
-                  name: circle
-                  size: 4
-                  stroke:
-                    color: '#000000'
-                  fill:
-                    color: '#000000'
-          text:
-            color: '#000000'
-            font:
-              size: 5
-              family: Droid Sans
-            label:
-              property: name
-
       - where: place = 'city'
         symbolizers:
           text:
@@ -45,7 +11,7 @@ feature-styles:
               color: '#ffffff'
             font:
               size: 25
-              family: Droid Sans
+              family: Liberation Sans
             fill:
               color: '#000000'
             label:

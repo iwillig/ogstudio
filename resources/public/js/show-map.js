@@ -13,7 +13,15 @@ var load_main = function (opts) {
     $('#show-map').height(height);
     $('#show-map').css('background', opts.mapInfo.bgcolor);
 
-    map = new OpenLayers.Map('show-map');
+    var osmLayer = new OpenLayers.Layer.OSM("OpenStreetMap");
+
+    var aliasproj = new OpenLayers.Projection("EPSG:3857");
+    aliasproj.projection = osmLayer.projection = aliasproj;
+
+    map = new OpenLayers.Map('show-map', {
+        projection: new OpenLayers.Projection("EPSG:3857"),
+        displayProjection: new OpenLayers.Projection("EPSG:4326")
+    });
 
     map.events.register('zoomend', map, function (evnt) {
         $('#resolution').html('Scale: ' + map.getScale());
@@ -36,10 +44,11 @@ var load_main = function (opts) {
         }
     );
     map.addLayer(layer);
+    map.addLayer(osmLayer);
 
     map.addControl(new OpenLayers.Control.LayerSwitcher());
-    map.addControl(new OpenLayers.Control.Permalink({anchor: true}));
+
     bounds = new OpenLayers.Bounds.fromArray(opts.mapInfo.bbox);
-    map.zoomToExtent(bounds);
+    map.zoomToExtent(bounds.transform(map.displayProjection, map.projection));
 
 };

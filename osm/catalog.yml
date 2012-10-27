@@ -3,7 +3,7 @@ workspace: osm
 
 # define the data stores for the map
 datastores:
-  - name: nyc
+  - name: maine
     type: postgis
 
 # define the style configuration objects
@@ -30,16 +30,16 @@ styles:
 tables:
 
   - name: planet_osm_line
-    datastore: nyc
+    datastore: maine
 
   - name: planet_osm_polygon
-    datastore: nyc
+    datastore: maine
 
   - name: planet_osm_point
-    datastore: nyc
+    datastore: maine
 
-  - name: processed_p
-    datastore: nyc
+  - name: shoreline
+    datastore: maine
 
 
 # define the map objects, the important stuff
@@ -47,10 +47,10 @@ maps:
   - name: Dark
     bgcolor: '#000000'
     epsg: 4326
-    bbox: [-74.2555913631521, 40.4961153951703,-73.7000090638712, 40.9155327770052]
+    bbox: [-70.734635849264,43.509397694486,-68.596421737936,44.73849315347]
     layers:
 
-      - table: processed_p
+      - table: shoreline
         style: processed_p
 
       - table: planet_osm_polygon

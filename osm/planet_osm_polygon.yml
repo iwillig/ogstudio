@@ -12,13 +12,16 @@ feature-styles:
               color: '#c9c9c9'
 
       - where: natural = 'water'
-        max: 108140.58654785156
+        zoom-levels:
+          max: 10
         symbolizers:
           polygon:
             fill:
               color: '#000000'
 
       - where: waterway = 'riverbank' or natural = 'bay'
+        zoom-levels:
+          max: 10
         symbolizers:
           polygon:
             fill:
