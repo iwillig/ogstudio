@@ -1,0 +1,9 @@
+name: style for admin_boundary_lines_0
+feature-styles:
+
+  - rules:
+      - symbolizers:
+          line:
+            stroke:
+              width: 1
+              color: '#898989'

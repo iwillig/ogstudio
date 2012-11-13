@@ -1,7 +1,10 @@
-name: Coastline data
+name: style for land_110
 feature-styles:
+
   - rules:
-      - symbolizers:
+      - zoom-levels:
+          min: 10
+        symbolizers:
           polygon:
             stroke:
               opacity: 0

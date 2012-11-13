@@ -23,7 +23,7 @@
   (format "http://%s:%s/public/%s" (:server-name req) (:server-port req) url))
 
 (defn layout
-  [request body & {:keys [title js] :or {title "Map the planet"}}]
+  [request body & {:keys [title js] :or {title "thing"}}]
   (html5
    [:head
     [:meta {:http-equiv "content-type" :content "text/html; charset=utf-8"}]
@@ -34,7 +34,7 @@
     [:title title]]
    [:body
     [:div.navbar
-     [:div.navbar-inner [:a.brand {:href "/"} "OpenGeo Studio"]]]
+     [:div.navbar-inner [:a.brand {:href "/"} "Home"]]]
     [:div.container-fluid
      body]
     js]))
@@ -45,7 +45,7 @@
     (layout req [:div (str (:gt style-info)) [:pre (escape-html (style->sld (:gt style-info)))]])))
 
 (defn show-map-layers [mapinfo]
-  [:ul
+  [:ul.layers
    (for [{table :table style :style} (:layers mapinfo)]
      [:li [:h4 "Layer"]
       [:p "Table " [:a {:href (str "/tables/" table)} table]]
@@ -61,12 +61,14 @@
        [:div#mapInfo
         [:p#zoom]
         [:p#resolution]
-        [:pre#bbox]
-        (show-map-layers map-info)]]
+        [:pre#bbox]]
+       (show-map-layers map-info)]
       [:div#show-map.map.span10]]
      :js (list (include-js
+                "http://maps.google.com/maps/api/js?v=3&amp&sensor=false"
                 (static-url req "js/openlayers/OpenLayers.js")
-                (static-url req "js/jquery-1.8.2.min.js")
+                (static-url req "js/jquery-1.8.2.min.js")                
+                "http://maps.stamen.com/js/tile.stamen.js?v1.2.0"
                 (static-url req "js/show-map.js"))
                (javascript-tag (format "load_main({mapInfo: %s});" (json-str map-info)))))))
 
@@ -89,6 +91,7 @@
       (layout
        req
        [:div
+        [:div#layerswitcher.olControlLayerSwitcher]
         [:h3 "Layer name: "    (.getName fs)]
         [:p "Feature count: "  (.size features)]
         [:p "Projection: "     (.getCoordinateReferenceSystem bounds)]
@@ -128,7 +131,7 @@
       [:div [:h2 "Maps"]
        [:a {:id "maps"}]
        [:ul
-        (for [[map-name m] maps]
+        (for [[map-name m] (sort maps)]
           [:li [:a {:href (str "/maps/" (name map-name))} (name  map-name)]])]]
       [:div [:h2 "Datastores"]
        [:a {:id "datastores"}]
@@ -138,12 +141,12 @@
       [:div [:h2 "Data tables"]
        [:a {:id "tables"}]
        [:ol
-        (for [[table-name table] tables]
+        (for [[table-name table] (sort tables)]
           [:li [:a {:href (str "/tables/" (name table-name))} (name table-name)]])]]
       [:div [:h2 "Styles"]
        [:a {:id "styles"}]
        [:ol
-        (for [[style-name style] styles]
+        (for [[style-name style] (sort styles)]
           [:li [:a {:href (str "/styles/" (name style-name))} (name style-name)]])]]
       [:div [:h2 "Fonts"]
        [:a {:id "fonts"}]

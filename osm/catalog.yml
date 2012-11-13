@@ -3,7 +3,7 @@ workspace: osm
 
 # define the data stores for the map
 datastores:
-  - name: maine
+  - name: ny
     type: postgis
 
 # define the style configuration objects
@@ -21,37 +21,65 @@ styles:
     path: osm/planet_osm_point.yml
 
 
+  - name: admin_boundary_lines_0
+    type: yaml
+    path: osm/admin_boundary_lines_0.yml
+
+
+  - name: land_110
+    type: yaml
+    path: osm/land_110.yml
+
+
   - name: processed_p
     type: yaml
     path: osm/processed_p.yml
+
+  - name: admin_states_provinces
+    type: yaml
+    path: osm/admin_states_provinces.yml
+
 
 
 # define the database tables
 tables:
 
   - name: planet_osm_line
-    datastore: maine
+    datastore: ny
 
   - name: planet_osm_polygon
-    datastore: maine
+    datastore: ny
 
   - name: planet_osm_point
-    datastore: maine
+    datastore: ny
 
   - name: shoreline
-    datastore: maine
+    datastore: ny
 
+  - name: admin_boundary_lines_0
+    datastore: ny
+
+
+  - name: land_110
+    datastore: ny
+
+  - name: admin_states_provinces
+    datastore: ny
 
 # define the map objects, the important stuff
 maps:
-  - name: Dark
-    bgcolor: '#000000'
+  - name: OpenStreetMap
+#    bgcolor: '#959eb2'
+    bgcolor: '#a5bfdd'
     epsg: 4326
-    bbox: [-70.734635849264,43.509397694486,-68.596421737936,44.73849315347]
+    bbox: [-106.49044495473433,26.5032364955807,-38.06759339223053,55.39983886672808]
     layers:
 
       - table: shoreline
         style: processed_p
+
+      - table: land_110
+        style: land_110
 
       - table: planet_osm_polygon
         style: planet_osm_polygon
@@ -61,3 +89,9 @@ maps:
 
       - table: planet_osm_point
         style: planet_osm_point
+
+      - table: admin_states_provinces
+        style: admin_states_provinces
+
+      - table: admin_boundary_lines_0
+        style: admin_boundary_lines_0

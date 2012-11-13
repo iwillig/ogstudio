@@ -9,6 +9,7 @@
    [clj-http.client   :as client]))
 
 (def ^:dynamic *geoserver-url* "http://localhost:8080/geoserver/rest")
+;; (def ^:dynamic *geoserver-url* "http://nielsen.dev.opengeo.org:8080/geoserver/rest")
 (def ^:dynamic *auth* ["admin" "geoserver"])
 
 (defn request [url & {:keys [method data content-type query-params]}]
@@ -20,10 +21,9 @@
                                 {"Accept" "application/json"}
                                 (or content-type {"Content-type" "application/json"}))
                       :basic-auth *auth*}]
-    (:body
-     (if data
-       (client/request (assoc request-info :body data))
-       (client/request request-info)))))
+    (if data
+      (client/request (assoc request-info :body data))
+      (client/request request-info))))
 
 (defn encode [s]
   (java.net.URLEncoder/encode s))
@@ -134,7 +134,7 @@
 
 
 (defn create-style [workspace style body]
-  (request (url-join (conj (make-workspace-url workspace) "styles"))
+  (request (url-join [*geoserver-url* "styles"])
            :data (clojure.java.io/input-stream  (.getBytes body))
            :query-params {"name" style}
            :content-type {"Content-type" "application/vnd.ogc.sld+xml"}
@@ -144,6 +144,7 @@
   (let [[style] (format-args args)]
     (request
      (url-join [*geoserver-url* "styles" style])
+     :query-params {"purge" true}
      :method :delete)))
 
 
@@ -151,29 +152,77 @@
   (request (url-join (make-layer-group))))
 
 (defn get-layer-group [group-name]
-  (request (url-join (make-layer-group group-name))))
+  (request (url-join (make-layer-group (name group-name)))))
 
 (defn delete-layer-group [group-name]
   (request (url-join (make-layer-group group-name))
            :method :delete))
 
-(defn create-layer-group [name styles layers]
+
+(defn create-layer-group [name layers styles]
   (request (url-join (make-layer-group))
            :data
            (json/json-str
             {:layerGroup
              {:name name
-              :bounds
-              {
-               :minx -180,
-               :maxx 180,
-               :miny -90,
-               :maxy 90,
-               :crs "EPSG:4326"}
               :layers {:layer layers}
               :styles {:style styles}}})
            :method :post))
 
+
+(defn test-lg []
+  (create-layer-group "test5" [{:name "airport_clip"}] [{:name "airport"}]))
+
+
+(defn create-all-datastores [catalog]
+  (doseq [ds (:datastores catalog)]
+    (println "Creating datastore " (:name ds))
+    (create-datastore
+     (:workspace catalog)
+     {:name (:name ds)
+      :connectionParameters
+      {:database (:name ds)
+       :user   (or  (:user ds) "postgres")
+       :host   (or  (:host ds) "localhost")
+       :port   (or  (:port ds) 5432)
+       :passwd "pass"
+       :dbtype (:type ds)}})))
+
+(defn create-all-tables [catalog]
+  (doseq [table (:tables catalog)]
+    (println "Creating feature type" (:name table))
+    (create-feature-type (:workspace catalog) (:datastore table) {:name (:name table)})))
+
+(defn create-all-styles [catalog]
+  (doseq [style (:styles catalog)]
+    (let [style-obj (core/load-style style)]
+
+      (try
+        (delete-style (:name style))
+        (catch Exception e (println e)))
+
+      (println "Creating style" (:name style))
+
+      (create-style
+       (:workspace catalog)
+       (:name style)
+       (gstyle/style->sld
+        (gstyle/make-sld {:name (:name style)
+                          :style style-obj}))))))
+
+(defn create-all-maps [catalog]
+  (doseq [m (:maps catalog)]
+    (do
+      (try
+        (delete-layer-group (:name m))
+        (catch Exception e (println e)))
+      (println "Creating map" (:name m))
+      (create-layer-group
+       (:name m)
+       (for [l (:layers m)]
+         {:name  (:table l)})
+       (for [l (:layers m)]
+         {:name (:style l)})))))
 
 (defn update-remote-geoserver [catalog]
 
@@ -184,33 +233,14 @@
       (catch Exception e (println e)))
 
     (println "Creating workspace" workspace)
+
     (create-workspace workspace)
-
-    (doseq [ds (:datastores catalog)]
-      (println "Creating datastore " (:name ds))
-      (create-datastore
-       workspace
-       {:name (:name ds)
-        :connectionParameters
-        {:database (:name ds)
-         :user (or  (:user ds) "postgres")
-         :host (or  (:host ds) "localhost")
-         :port (or  (:port ds) 5432)
-         :dbtype (:type ds)}}))
     
-    (doseq [table (:tables catalog)]
-      (println "Creating feature type" (:name table))
-      (create-feature-type workspace (:datastore table) {:name (:name table)}))
+    (create-all-datastores catalog)
+    (create-all-tables     catalog)
+    (create-all-styles     catalog)
 
-    (doseq [style (:styles catalog)]
-      (let [style-obj (core/load-style style)]
-        (println "Creating style" (:name style))
-        (create-style
-         workspace
-         (:name style)
-         (gstyle/style->sld
-          (gstyle/make-sld {:name (:name style)
-                            :style style-obj})))))))
+    (create-all-maps       catalog)))
 
 
 (defn -main [& args]
