@@ -5,3 +5,7 @@
     max-height:600px;
     overflow:scroll;
 }
+
+.olMap label {
+    display: inline;
+}
